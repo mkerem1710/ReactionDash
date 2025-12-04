@@ -1,19 +1,108 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reaction Test</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ReactionDash</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+        user-select: none;
+        cursor: pointer;
+        background-color: black;
+        color: white;
+        transition: background-color 0.3s;
+    }
+
+    #countdown, #result, #instruction {
+        font-size: 3rem;
+    }
+</style>
 </head>
 <body>
 
-    <div class="box" id="box">
-        Click when it turns green
-    </div>
+<div id="instruction">Click or press SPACE to start</div>
+<div id="countdown" style="display:none;"></div>
+<div id="result" style="display:none;"></div>
 
-    <p id="result"></p>
+<script>
+let startTime;
+let waitingForGreen = false;
+let greenShown = false;
 
-    <script src="script.js"></script>
+// Mouse click
+document.body.addEventListener("click", handleStartOrMeasure);
+
+// Space key
+document.addEventListener("keydown", (e) => {
+    if (e.code === "Space") {
+        handleStartOrMeasure();
+    }
+});
+
+function handleStartOrMeasure() {
+    if (!waitingForGreen && !greenShown) {
+        startGame();
+    } else if (greenShown) {
+        measureReaction();
+    }
+}
+
+function startGame() {
+    document.getElementById("instruction").style.display = "none";
+    document.getElementById("result").style.display = "none";
+
+    startCountdown();
+}
+
+function startCountdown() {
+    waitingForGreen = true;
+    document.body.style.backgroundColor = "black";
+
+    let count = 3;
+    const countdownEl = document.getElementById("countdown");
+    countdownEl.style.display = "block";
+    countdownEl.textContent = count;
+
+    const interval = setInterval(() => {
+        count--;
+        countdownEl.textContent = count;
+
+        if (count === 0) {
+            clearInterval(interval);
+            showGreen();
+        }
+    }, 1000);
+}
+
+function showGreen() {
+    document.getElementById("countdown").style.display = "none";
+    document.body.style.backgroundColor = "green";
+    greenShown = true;
+
+    startTime = performance.now();
+}
+
+function measureReaction() {
+    const reactionTime = performance.now() - startTime;
+
+    document.getElementById("result").style.display = "block";
+    document.getElementById("result").textContent =
+        "Your reaction time: " + Math.round(reactionTime) + " ms";
+
+    document.body.style.backgroundColor = "black";
+
+    greenShown = false;
+    waitingForGreen = false;
+}
+</script>
+
 </body>
 </html>
